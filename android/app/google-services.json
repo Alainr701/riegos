@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "821700147605",
+    "firebase_url": "https://emp-irrigation-proyect-default-rtdb.firebaseio.com",
+    "project_id": "emp-irrigation-proyect",
+    "storage_bucket": "emp-irrigation-proyect.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821700147605:android:761f7876a9654dd3ac9e9c",
+        "android_client_info": {
+          "package_name": "com.demostbo.cruz_verde"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "821700147605-g26q8ns1g8emqe7shreeqglkvfi0jdse.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx5KwD5EujDP25hmBi6NZ0S_G7xLIxO6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "821700147605-g26q8ns1g8emqe7shreeqglkvfi0jdse.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
