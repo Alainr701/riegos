@@ -28,10 +28,11 @@ class _ProgrammingScreenState extends State<ProgrammingScreen> {
     _controllerTitle.text = widget.valve.title;
     _controllerMinute.text = widget.valve.time.toString();
     _controllerturnOnEvery.text = widget.valve.turnOnEvery.toString();
-    if (widget.valve.type == 'Programado') {
-      _programmingType = ProgrammingType.manual;
-    } else {
+
+    if (widget.valve.type == 'Horario') {
       _programmingType = ProgrammingType.automatic;
+    } else {
+      _programmingType = ProgrammingType.manual;
     }
   }
 
@@ -86,6 +87,8 @@ class _ProgrammingScreenState extends State<ProgrammingScreen> {
                   onChanged: (value) {
                     setState(() {
                       widget.valve.state = value;
+                      IrregatiobMethods.updateState(
+                          widget.valve.state, widget.valveId);
                     });
                   },
                 ),
@@ -356,7 +359,17 @@ class _ProgrammingScreenState extends State<ProgrammingScreen> {
                             ],
                           );
                         });
-                    if (result != null) widget.valve.times.add(result);
+                    if (result != null) {
+                      int index = widget.valve.times.indexWhere((element) {
+                        return element == 0;
+                      });
+                      if (index == -1) {
+                        widget.valve.times.add(result);
+                      } else {
+                        widget.valve.times[index] = result;
+                      }
+                      setState(() {});
+                    }
                     setState(() {});
                   },
                 ),
@@ -377,11 +390,17 @@ class _ProgrammingScreenState extends State<ProgrammingScreen> {
                     //mostrar si e es diferente de 0
                     if (e == 0) return const SizedBox();
                     return ListTile(
-                      title: Text("$e"),
+                      //el title debe parecerse a 10:20
+                      title: Text(
+                        "${e ~/ 100}:${e % 100}",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                        ),
+                      ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
-                          // widget.valve.times.remove(e);
                           widget.valve.times[widget.valve.times.indexOf(e)] = 0;
                           setState(() {});
                         },
@@ -400,7 +419,7 @@ class _ProgrammingScreenState extends State<ProgrammingScreen> {
           IrregatiobMethods.updateValve(
               Valve(
                   title: _controllerTitle.text.trim(),
-                  type: _programmingType == ProgrammingType.automatic
+                  type: _programmingType == ProgrammingType.manual
                       ? 'Programado'
                       : 'Horario',
                   turnOnEvery: int.parse(_controllerturnOnEvery.text.trim()),
@@ -410,6 +429,11 @@ class _ProgrammingScreenState extends State<ProgrammingScreen> {
                   days: widget.valve.days),
               widget.valveId);
           Provider.of<AppController>(context, listen: false).update();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Se ha guardado correctamente"),
+            ),
+          );
         },
         child: const Icon(Icons.save),
       ),

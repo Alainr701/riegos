@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              Image.asset('assets/imagen.jpg', scale: 2),
+              Image.asset('assets/icon_proyect.png', scale: 2),
               const SizedBox(height: 10),
               CustomTextField(
                   controller: _emailController,
@@ -38,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   icon: Icons.email),
               const SizedBox(height: 10),
               CustomTextField(
+                  obscureText: true,
                   controller: _passwordController,
                   hintText: 'Contraseña',
                   icon: Icons.lock),

@@ -1,6 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:irregation_proyect/controller/app_controller.dart';
+import 'package:irregation_proyect/screens/register_screen.dart';
+import 'package:irregation_proyect/screens/user_screen.dart';
+import 'package:irregation_proyect/screens/ventilador_screen.dart';
 import 'package:irregation_proyect/services/auth_methods.dart';
 import 'package:irregation_proyect/screens/programming_screen.dart';
 import 'package:irregation_proyect/services/irregation_methods.dart';
@@ -15,23 +18,45 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  double temperature = 0;
+  int temperature = 0;
+  List<Color> colors(int temp) {
+    if (temp < 10) {
+      return [Colors.blue, const Color.fromARGB(255, 0, 0, 255)];
+    } else if (temp < 20) {
+      return [
+        const Color.fromARGB(255, 0, 255, 0),
+        const Color.fromARGB(255, 7, 165, 7)
+      ];
+    } else if (temp < 30) {
+      return [
+        const Color.fromARGB(255, 255, 255, 0),
+        const Color.fromARGB(255, 172, 172, 39)
+      ];
+    } else {
+      return [
+        const Color.fromARGB(255, 255, 0, 0),
+        const Color.fromARGB(255, 224, 92, 92)
+      ];
+    }
+  }
+
+  late DatabaseReference starCountRef;
+  bool isActive = false;
   @override
   void initState() {
-    DatabaseReference starCountRef = FirebaseDatabase.instance
+    starCountRef = FirebaseDatabase.instance
         .ref('${auth.currentUser?.uid}/data/temperature');
     starCountRef.onValue.listen((DatabaseEvent event) {
-      temperature = event.snapshot.value as double;
+      temperature = int.parse(event.snapshot.value.toString());
       setState(() {});
     });
     super.initState();
   }
 
   @override
-  void didChangeDependencies() {
-    Provider.of<AppController>(context, listen: true);
-
-    super.didChangeDependencies();
+  void dispose() {
+    starCountRef.onDisconnect();
+    super.dispose();
   }
 
   @override
@@ -40,9 +65,34 @@ class _HomeScreenState extends State<HomeScreen> {
       //color casi blanco
       backgroundColor: const Color.fromRGBO(229, 229, 229, 1),
       appBar: AppBar(
-        title: const Text("CRUZ VERDE"),
+        title: const Text("SISTEMA DE RIEGO CALANGACHI"),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 7, 139, 11),
+        actions: [
+          FutureBuilder(
+            future: IrregatiobMethods.getUser(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox();
+              }
+              //user is admin
+              if (snapshot.data.type == 'Administrador') {
+                return IconButton(
+                  icon: const Icon(Icons.person_add),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return const RegisterScreen();
+                      },
+                    ));
+                  },
+                );
+              } else {
+                  return const SizedBox();
+              }
+            },
+          ),
+        ],
       ),
       drawer: _buildDrawer(),
       body: Column(
@@ -56,58 +106,63 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container _buildTemperature(double temp) {
-    return Container(
-      height: 160,
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        //celeste claro degradado
-        gradient: const LinearGradient(
-          //color medio negro
-          colors: [
-            Color.fromARGB(255, 235, 161, 3),
-            Color.fromARGB(255, 196, 94, 10),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomLeft,
+  Widget _buildTemperature(int temp) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isActive = !isActive;
+          IrregatiobMethods.updateActive(isActive);
+        });
+      },
+      child: Container(
+        height: 160,
+        width: double.infinity,
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          //celeste claro degradado
+          gradient: LinearGradient(
+            //color medio negro
+            colors: colors(temp),
+            begin: Alignment.topCenter,
+            end: Alignment.bottomLeft,
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 10),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Temperatura actual : ",
-              style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(WeatherIcons.thermometer,
-                  size: 40, color: Colors.white),
-              const SizedBox(width: 10),
-              Text(
-                '$temp °C',
-                style: const TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 10),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Temperatura actual : ",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(WeatherIcons.thermometer,
+                    size: 40, color: Colors.white),
+                const SizedBox(width: 10),
+                Text(
+                  '$temp °C',
+                  style: const TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -120,13 +175,13 @@ class _HomeScreenState extends State<HomeScreen> {
           const UserAccountsDrawerHeader(
             decoration: BoxDecoration(color: Color.fromARGB(255, 12, 100, 59)),
             accountName: Text(
-              "Sistema Cruz Verde",
+              "SISTEMA DE RIEGO",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
             accountEmail: Text(
-              "a701e3127@gmail.com",
+              "COMUNIDAD CALANGACHI",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -138,16 +193,29 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.info,
             ),
             applicationIcon: Icon(Icons.local_play),
-            applicationName: 'Sistema de riego Cruz Verde',
+            applicationName: 'SISTEMA DE RIEGO',
             applicationVersion: 'version: 1.0.0',
             applicationLegalese: '© 2023 proyect',
             aboutBoxChildren: [],
             child: Text('Acerca de la aplicacion'),
           ),
           ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Perfil'),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return const UserScreen();
+                },
+              ));
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.power_settings_new_outlined),
             title: const Text('Salir'),
-            onTap: () => AuthMethods().signOut(),
+            onTap: () {
+              AuthMethods().signOut();
+            },
           ),
         ],
       ),
@@ -155,10 +223,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
   const Body({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  @override
+  void didChangeDependencies() {
+    Provider.of<AppController>(context, listen: true);
+
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,22 +315,37 @@ class Body extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 20),
-                  BuildBox(
-                    title: snapshot.data!.valve4.title,
-                    type: snapshot.data!.valve4.type,
-                    minutes: snapshot.data!.valve4.time,
-                    status: snapshot.data!.valve4.state,
-                    days: snapshot.data!.valve4.days,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProgrammingScreen(
-                                valve: snapshot.data!.valve4,
-                                valveId: "valve4")),
-                      );
-                    },
+                  Container(
+                    height: 50,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        const Text(
+                          "Programar Ventilador",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VentiladorScreen(
+                                  temperature: snapshot.data!.isTemperature,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.add),
+                        ),
+                      ],
+                    ),
                   ),
+
                   const SizedBox(height: 100),
                 ],
               );
@@ -270,14 +365,15 @@ class BuildBox extends StatelessWidget {
   final List<int> days;
   final VoidCallback onTap;
 
-  const BuildBox(
-      {super.key,
-      required this.title,
-      required this.type,
-      required this.minutes,
-      required this.status,
-      required this.days,
-      required this.onTap});
+  const BuildBox({
+    super.key,
+    required this.title,
+    required this.type,
+    required this.minutes,
+    required this.status,
+    required this.days,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
