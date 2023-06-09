@@ -2,10 +2,10 @@ class Irregation {
   String? uid;
   bool isActive;
   int isTemperature;
+  int isHeater;
   double temperature;
   Valve valve1;
   Valve valve2;
-  Valve valve3;
 
   Irregation({
     this.uid,
@@ -14,17 +14,17 @@ class Irregation {
     required this.temperature,
     required this.valve1,
     required this.valve2,
-    required this.valve3,
+    required this.isHeater,
   });
 
   factory Irregation.fromJson(Map<dynamic, dynamic> json) => Irregation(
         uid: json["uid"],
         isActive: json["isActive"],
         isTemperature: json["isTemperature"].toInt(),
+        isHeater: json["isHeater"].toInt(),
         temperature: json["temperature"].toDouble(),
         valve1: Valve.fromJson(json["valve1"] as Map<dynamic, dynamic>),
         valve2: Valve.fromJson(json["valve2"] as Map<dynamic, dynamic>),
-        valve3: Valve.fromJson(json["valve3"] as Map<dynamic, dynamic>),
       );
 
   Map<String, dynamic> toJson() => {
@@ -32,9 +32,9 @@ class Irregation {
         "isActive": isActive,
         "isTemperature": isTemperature,
         "temperature": temperature,
+        "isHeater": isHeater,
         "valve1": valve1.toJson(),
         "valve2": valve2.toJson(),
-        "valve3": valve3.toJson(),
       };
 }
 

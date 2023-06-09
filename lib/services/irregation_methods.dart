@@ -36,10 +36,52 @@ class IrregatiobMethods {
     await ref.child('$user/data/$text/state').set(state);
   }
 
+  //updateTitle
+  static Future<void> updateTitle(String title, String text) async {
+    String user = auth.currentUser?.uid ?? '';
+    await ref.child('$user/data/$text/title').set(title);
+  }
+
+  //UPDATE weeks
+  static Future<void> updateWeeks(int position, int weeks, String text) async {
+    String user = auth.currentUser?.uid ?? '';
+    await ref.child('$user/data/$text/days/$position').set(weeks);
+  }
+
+  //update time
+  static Future<void> updateTime(int time, String text) async {
+    String user = auth.currentUser?.uid ?? '';
+    await ref.child('$user/data/$text/time').set(time);
+  }
+
+  //updateProgrammingType
+  static Future<void> updateType(String programmingType, String text) async {
+    String user = auth.currentUser?.uid ?? '';
+    await ref.child('$user/data/$text/type').set(programmingType);
+  }
+
+  //update updateTurnOnEvery
+  static Future<void> updateTurnOnEvery(int turnOnEvery, String text) async {
+    String user = auth.currentUser?.uid ?? '';
+    await ref.child('$user/data/$text/turnOnEvery').set(turnOnEvery);
+  }
+
+  //UPDATE times
+  static Future<void> updateTimes(int position, int times, String text) async {
+    String user = auth.currentUser?.uid ?? '';
+    await ref.child('$user/data/$text/times/$position').set(times);
+  }
+
   //update isTemperature
   static Future<void> updateTemperature(int isTemperature) async {
     String user = auth.currentUser?.uid ?? '';
     await ref.child('$user/data/isTemperature').set(isTemperature);
+  }
+
+  //UPDATE CALEFACTOR
+  static Future<void> updateHeater(int heater) async {
+    String user = auth.currentUser?.uid ?? '';
+    await ref.child('$user/data/isHeater').set(heater);
   }
 
   //update isActive
@@ -66,5 +108,26 @@ class IrregatiobMethods {
   static Future<void> updateUser(model.User user) async {
     String id = auth.currentUser?.uid ?? '';
     await ref.child('$id/user').set(user.toJson());
+  }
+
+  //get datos de datos data/dayX
+  static Future<List<int>> getDays(
+    String day,
+  ) async {
+    String user = auth.currentUser?.uid ?? '';
+    final snapshot = await ref.child('$user/data/$day').get();
+    try {
+      if (snapshot.exists) {
+        List<int> days = [];
+        for (var item in snapshot.value as List<dynamic>) {
+          days.add(item as int);
+        }
+        return days;
+      }
+    } catch (e) {
+      log(e.toString());
+      return [];
+    }
+    return [];
   }
 }

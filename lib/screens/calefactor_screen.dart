@@ -3,22 +3,22 @@ import 'package:irregation_proyect/controller/app_controller.dart';
 import 'package:irregation_proyect/services/irregation_methods.dart';
 import 'package:provider/provider.dart';
 
-class VentiladorScreen extends StatefulWidget {
-  final int temperature;
+class CalefactorScreen extends StatefulWidget {
+  final int header;
 
-  const VentiladorScreen({super.key, required this.temperature});
+  const CalefactorScreen({super.key, required this.header});
 
   @override
-  State<VentiladorScreen> createState() => _VentiladorScreenState();
+  State<CalefactorScreen> createState() => _CalefactorScreenState();
 }
 
-class _VentiladorScreenState extends State<VentiladorScreen> {
+class _CalefactorScreenState extends State<CalefactorScreen> {
   RangeValues _values = const RangeValues(0, 50);
-  double isTemperature = 0;
+  double isHeader = 0;
   @override
   void initState() {
-    isTemperature = widget.temperature.toDouble();
-    _values = RangeValues(0, isTemperature);
+    isHeader = widget.header.toDouble();
+    _values = RangeValues(0, isHeader);
     super.initState();
   }
 
@@ -27,14 +27,14 @@ class _VentiladorScreenState extends State<VentiladorScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Extractor'),
+          title: const Text('Calefactor'),
           centerTitle: true,
           backgroundColor: const Color.fromARGB(255, 12, 100, 59),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Extractor encendido a: ${isTemperature.round()} °C',
+            Text('Calefactor se enciende a: ${isHeader.round()} °C',
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             RangeSlider(
@@ -50,7 +50,7 @@ class _VentiladorScreenState extends State<VentiladorScreen> {
               onChanged: (RangeValues values) {
                 setState(() {
                   _values = values;
-                  isTemperature = _values.end;
+                  isHeader = _values.end;
                 });
               },
             ),
@@ -59,7 +59,7 @@ class _VentiladorScreenState extends State<VentiladorScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            IrregatiobMethods.updateTemperature(isTemperature.round());
+            IrregatiobMethods.updateHeater(isHeader.round());
             Provider.of<AppController>(context, listen: false).update();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

@@ -26,9 +26,9 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         border: const OutlineInputBorder(),
-        prefixIcon: Icon(icon, color: const Color.fromARGB(255, 7, 139, 11)),
+        prefixIcon: Icon(icon, color: const Color.fromARGB(255, 12, 100, 59)),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Color.fromARGB(255, 7, 139, 11)),
+          borderSide: BorderSide(color: Color.fromARGB(255, 12, 100, 59)),
         ),
       ),
       validator: (val) => validator!(val),

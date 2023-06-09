@@ -1,4 +1,5 @@
 class User {
+  String? uid;
   String name;
   String email;
   bool state;
@@ -6,6 +7,7 @@ class User {
   int age;
   String type;
   User({
+    this.uid,
     required this.name,
     required this.email,
     required this.state,
@@ -15,6 +17,7 @@ class User {
   });
   factory User.fromJson(Map<dynamic, dynamic> json) {
     return User(
+      uid: json['uid'],
       name: json['name'],
       email: json['gmail'],
       state: json['state'],
@@ -25,6 +28,7 @@ class User {
   }
   Map<String, dynamic> toJson() {
     return {
+      'uid': uid,
       'name': name,
       'gmail': email,
       'state': state,
